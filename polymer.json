@@ -1,8 +1,7 @@
 {
   "npm": true,
   "lint": {
-    "rules": [
-      "polymer-3"
-    ]
-  }
+    "rules": ["polymer-3"]
+  },
+  "extraDependencies": ["node_modules/monaco-editor/**"]
 }
