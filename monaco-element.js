@@ -8,7 +8,6 @@ import iframeScript from './monaco';
  *
  * @customElement
  * @polymer
- * @demo demo/index.html
  */
 class MonacoElement extends PolymerElement {
   constructor() {
@@ -37,14 +36,17 @@ class MonacoElement extends PolymerElement {
       value: {
         type: String,
         value: 'monaco-element',
+        observer: 'monacoValueChanged',
       },
       language: {
         type: String,
         value: 'javascript',
+        observer: 'monacoLanguageChanged',
       },
       theme: {
         type: String,
         value: 'vs-dark',
+        observer: 'monacoThemeChanged',
       },
     };
   }
@@ -83,7 +85,7 @@ class MonacoElement extends PolymerElement {
   _handleMessage(data) {
     if (data.event === eventTypes.valueChanged) {
       this.dispatchEvent(
-        new CustomEvent('value-changed', { value: data.payload })
+        new CustomEvent('value-changed', { detail: data.payload })
       );
     } else if (data.event === eventTypes.ready) {
       this.onIframeReady();
@@ -91,24 +93,27 @@ class MonacoElement extends PolymerElement {
   }
 
   onIframeReady() {
-    this.monacoValue = this.value;
-    this.monacoLanguage = this.language;
-    this.monacoTheme = this.theme;
+    this.monacoValueChanged(this.value);
+    this.monacoLanguageChanged(this.language);
+    this.monacoThemeChanged(this.theme);
   }
 
-  set monacoValue(value) {
+  monacoValueChanged(value) {
     this.postMessage(eventTypes.valueChanged, value);
   }
 
-  set monacoLanguage(value) {
+  monacoLanguageChanged(value) {
     this.postMessage(eventTypes.languageChanged, value);
   }
 
-  set monacoTheme(value) {
+  monacoThemeChanged(value) {
     this.postMessage(eventTypes.themeChanged, value);
   }
 
   postMessage(event, payload) {
+    if (!this.iframe) {
+      return;
+    }
     this.iframe.contentWindow.postMessage(
       JSON.stringify({ event, payload }),
       window.location.href
