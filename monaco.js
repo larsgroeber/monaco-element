@@ -1,3 +1,6 @@
+/**
+ * Gets injected into the iframe after monaco loader runs.
+ */
 export default `
 const eventTypes = {
   ready: 'ready',
@@ -79,7 +82,6 @@ class MonacoEditor {
 
   setupEventListener(type, callback) {
     window.addEventListener(type, data => {
-      console.log(type + ' inside:', data);
       callback(data);
     });
   }

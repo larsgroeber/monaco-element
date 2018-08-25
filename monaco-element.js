@@ -6,8 +6,15 @@ import iframeScript from './monaco';
  * `monaco-element`
  * Webcomponent wrapper for the monaco editor.
  *
+ * Sets value, language and theme.
+ * Offers a value-changed event.
+ *
+ * Partly influenced by https://github.com/PolymerVis/monaco-editor
+ *
  * @customElement
  * @polymer
+ *
+ * @author Lars Gröber <larsgroeber7@gmail.com>
  */
 class MonacoElement extends PolymerElement {
   constructor() {
@@ -28,9 +35,10 @@ class MonacoElement extends PolymerElement {
           padding: 0;
         }
       </style>
-      <iframe id="iframe" style="width: 100%"></iframe>
+      <iframe id="iframe"></iframe>
     `;
   }
+
   static get properties() {
     return {
       value: {
@@ -51,9 +59,25 @@ class MonacoElement extends PolymerElement {
     };
   }
 
+  get document() {
+    return this.iframe.contentWindow.document;
+  }
+
+  get libPath() {
+    return 'node_modules/monaco-editor/min/vs';
+  }
+
   ready() {
     super.ready();
-    // do something that requires access to the shadow tree
+
+    this.initIFrame();
+
+    window.addEventListener('message', message => {
+      this.handleMessage(message);
+    });
+  }
+
+  initIFrame() {
     this.iframe = this.shadowRoot.querySelector('#iframe');
     const div = this.document.createElement('div');
     div.id = 'container';
@@ -65,10 +89,6 @@ class MonacoElement extends PolymerElement {
         this.insertScriptElement({ text: iframeScript });
         this.insertStyle();
       },
-    });
-
-    window.addEventListener('message', message => {
-      this.handleMessage(message);
     });
   }
 
@@ -88,11 +108,11 @@ class MonacoElement extends PolymerElement {
         new CustomEvent('value-changed', { detail: data.payload })
       );
     } else if (data.event === eventTypes.ready) {
-      this.onIframeReady();
+      this.onIFrameReady();
     }
   }
 
-  onIframeReady() {
+  onIFrameReady() {
     this.monacoValueChanged(this.value);
     this.monacoLanguageChanged(this.language);
     this.monacoThemeChanged(this.theme);
@@ -157,14 +177,6 @@ class MonacoElement extends PolymerElement {
       style.appendChild(this.document.createTextNode(css));
     }
     head.appendChild(style);
-  }
-
-  get document() {
-    return this.iframe.contentWindow.document;
-  }
-
-  get libPath() {
-    return 'node_modules/monaco-editor/min/vs';
   }
 }
 
