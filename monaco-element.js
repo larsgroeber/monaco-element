@@ -1,5 +1,6 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import { eventTypes } from './utils';
+import iframeScript from './monaco';
 
 /**
  * `monaco-element`
@@ -52,7 +53,18 @@ class MonacoElement extends PolymerElement {
     super.ready();
     // do something that requires access to the shadow tree
     this.iframe = this.shadowRoot.querySelector('#iframe');
-    this.iframe.src = './monaco.html';
+    const div = this.document.createElement('div');
+    div.id = 'container';
+    this.document.body.appendChild(div);
+
+    this.insertScriptElement({
+      src: `${this.libPath}/loader.js`,
+      onload: () => {
+        this.insertScriptElement({ text: iframeScript });
+        this.insertStyle();
+      },
+    });
+
     window.addEventListener('message', message => {
       this.handleMessage(message);
     });
@@ -101,6 +113,53 @@ class MonacoElement extends PolymerElement {
       JSON.stringify({ event, payload }),
       window.location.href
     );
+  }
+
+  insertScriptElement({ src, text, onload }) {
+    const ele = this.document.createElement('script');
+    if (src) ele.src = src;
+    if (text) ele.text = text;
+    if (onload) ele.onload = onload;
+    this.document.head.appendChild(ele);
+  }
+
+  insertStyle() {
+    var css = `
+    body {
+      height: 100vh;
+      overflow: hidden;
+      margin: 0;
+    }    
+    #container {
+      width: 100%;
+      height: 100%;
+    }
+    .debug-red {
+      background : red;
+    }
+    .debug-green {
+      background : green;
+    }
+    html,body {
+      margin : 0px;
+    }`;
+    const head = this.document.head;
+    const style = this.document.createElement('style');
+    style.type = 'text/css';
+    if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(this.document.createTextNode(css));
+    }
+    head.appendChild(style);
+  }
+
+  get document() {
+    return this.iframe.contentWindow.document;
+  }
+
+  get libPath() {
+    return 'node_modules/monaco-editor/min/vs';
   }
 }
 

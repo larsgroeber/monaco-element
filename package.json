@@ -3,7 +3,8 @@
   "description": "Webcomponent wrapper for the monaco editor.",
   "main": "monaco-element.js",
   "dependencies": {
-    "@polymer/polymer": "^3.0.0"
+    "@polymer/polymer": "^3.0.0",
+    "monaco-editor": "^0.14.3"
   },
   "devDependencies": {
     "@polymer/iron-demo-helpers": "^3.0.0-pre.19",

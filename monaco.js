@@ -1,4 +1,10 @@
-import { eventTypes } from './utils';
+export default `
+const eventTypes = {
+  ready: 'ready',
+  valueChanged: 'valueChanged',
+  languageChanged: 'languageChanged',
+  themeChanged: 'themeChanged',
+};
 
 class MonacoEditor {
   constructor() {
@@ -73,7 +79,7 @@ class MonacoEditor {
 
   setupEventListener(type, callback) {
     window.addEventListener(type, data => {
-      console.log(`${type} inside:`, data);
+      console.log(type + ' inside:', data);
       callback(data);
     });
   }
@@ -94,3 +100,4 @@ class MonacoEditor {
 }
 
 new MonacoEditor();
+`;
