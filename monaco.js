@@ -30,9 +30,7 @@ class MonacoEditor {
       const model = this.editor.getModel();
       model.onDidChangeContent(() => {
         const value = model.getValue();
-        if (value !== this.value) {
-          this.onValueChanged(value);
-        }
+        this.onValueChanged(value);
       });
 
       this.ready();
@@ -50,7 +48,7 @@ class MonacoEditor {
   _handleMessage(data) {
     switch (data.event) {
       case eventTypes.valueChanged:
-        this.onValueChanged(data.payload);
+        this.onInputValueChanged(data.payload);
         break;
       case eventTypes.languageChanged:
         this.onLanguageChanged(data.payload);
@@ -86,10 +84,19 @@ class MonacoEditor {
     });
   }
 
+  onInputValueChanged(newValue) {
+    if (newValue !== this.value) {
+      this.value = newValue;
+      this.editor.getModel().setValue(newValue);
+      this.postMessage(eventTypes.valueChanged, newValue);
+    }
+  } 
+
   onValueChanged(newValue) {
-    this.value = newValue;
-    this.editor.getModel().setValue(newValue);
-    this.postMessage(eventTypes.valueChanged, newValue);
+    if (newValue !== this.value) {
+      this.value = newValue;
+      this.postMessage(eventTypes.valueChanged, newValue);
+    }
   }
 
   onLanguageChanged(newLang) {
