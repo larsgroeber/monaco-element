@@ -3,5 +3,5 @@
   "lint": {
     "rules": ["polymer-3"]
   },
-  "extraDependencies": ["node_modules/monaco-editor/**"]
+  "extraDependencies": ["node_modules/monaco-editor/min/vs/**"]
 }
