@@ -3,7 +3,7 @@
   "description": "Webcomponent wrapper for the monaco editor.",
   "main": "monaco-element.js",
   "license": "MIT",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "keywords": [
     "webcomponent",
     "monaco",

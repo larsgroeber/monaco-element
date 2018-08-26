@@ -2,6 +2,8 @@
 
 Webcomponent wrapper for the monaco editor implementing basic functionality.
 
+[DEMO](https://larsg7.github.io/monaco-element/build/default/)
+
 ## Installation
 
 ```
