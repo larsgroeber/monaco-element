@@ -2,6 +2,10 @@
 
 Webcomponent wrapper for the monaco editor implementing basic functionality.
 
+[![GitHub license](https://img.shields.io/github/license/Larsg7/monaco-element.svg)](https://github.com/Larsg7/monaco-element/blob/master/LICENSE)
+
+[![NPM](https://nodei.co/npm/monaco-element.png?compact=true)](https://nodei.co/npm/monaco-element/)
+
 [DEMO](https://larsg7.github.io/monaco-element/build/default/)
 
 ## Installation
@@ -27,7 +31,7 @@ import 'monaco-element';
 
 ## Caveats
 
-Monaco Editor only works in light DOM, to make it work inside a custom component an `iframe` is created which loads `loader.js` (usually found in `node_modules/monaco-editor/min/vs`). When using this component, `<libPath>/loader.js` has to be accessible.
+Monaco Editor only works in light DOM, to make it work inside a custom component an `iframe` is created which loads `loader.js` (usually found in `node_modules/monaco-editor/min/vs`). When using this component `<libPath>/loader.js` has to be accessible.
 
 ### Polymer
 
