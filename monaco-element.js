@@ -56,15 +56,15 @@ class MonacoElement extends PolymerElement {
         value: 'vs-dark',
         observer: 'monacoThemeChanged',
       },
+      libPath: {
+        type: String,
+        value: 'node_modules/monaco-editor/min/vs',
+      },
     };
   }
 
   get document() {
     return this.iframe.contentWindow.document;
-  }
-
-  get libPath() {
-    return 'node_modules/monaco-editor/min/vs';
   }
 
   ready() {
