@@ -14,7 +14,7 @@ Webcomponent wrapper for the monaco editor implementing basic functionality.
 npm install monaco-element
 ```
 
-## Usage
+## Usage (Polymer 3)
 
 ```js
 import 'monaco-element';
@@ -36,6 +36,18 @@ Monaco Editor only works in light DOM, to make it work inside a custom component
 ### Polymer
 
 Add `node_modules/monaco-editor/min/**` to your `extraDependencies` in `polymer.json` to make the script available on `polymer build`.
+
+### Angular 6
+
+Add this to the `assets` section of your `angular.json`:
+
+```
+{
+  "glob": "**/*",
+  "input": "./node_modules/monaco-editor/min/vs/",
+  "output": "/node_modules/monaco-editor/min/vs/"
+}
+```
 
 ## Acknowledgements
 
