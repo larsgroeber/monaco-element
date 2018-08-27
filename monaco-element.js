@@ -43,7 +43,7 @@ class MonacoElement extends PolymerElement {
     return {
       value: {
         type: String,
-        value: 'monaco-element',
+        value: '',
         observer: 'monacoValueChanged',
       },
       language: {
@@ -94,10 +94,13 @@ class MonacoElement extends PolymerElement {
 
   handleMessage(message) {
     try {
-      const data = JSON.parse(message.data);
+      let data = message.data;
+      if (typeof message.data === 'string') {
+        data = JSON.parse(message.data);
+      }
       this._handleMessage(data);
     } catch (error) {
-      console.error('Error while parsing message:', error);
+      console.error('[monaco-element] Error while parsing message:', error);
       return;
     }
   }

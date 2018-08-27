@@ -25,6 +25,9 @@ class MonacoEditor {
         value: this.value,
         language: this.language,
         scrollBeyondLastLine: false,
+        minimap: {
+          enabled: false
+        }
       });
 
       const model = this.editor.getModel();
