@@ -77,6 +77,13 @@ class MonacoElement extends PolymerElement {
     });
   }
 
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    window.removeEventListener('message', message => {
+      this.handleMessage(message);
+    });
+  }
+
   initIFrame() {
     this.iframe = this.shadowRoot.querySelector('#iframe');
     const div = this.document.createElement('div');
