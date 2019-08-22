@@ -45,11 +45,13 @@ class MonacoElement extends LitElement {
 
   static get properties() {
     return {
-      value: { type: String },
+      value: { type: String, reflect: true },
+      rValue: { type: String, reflect: true, attribute: 'r-value' },
       language: { type: String, reflect: true},
       theme: { type: String, reflect: true},
       autogrow: {type: Boolean, reflect: true, attribute: 'autogrow'},
       maxHeight: {type: Number, reflect: true, attribute: 'max-height'},
+      minHeight: {type: Number, reflect: true, attribute: 'min-height'},
       libPath: { type: String },
     };
   }
@@ -67,6 +69,8 @@ class MonacoElement extends LitElement {
         this.monacoAutogrowChanged();
       } else if (name == 'max-height') {
         this.monacoMaxHeightChanged();
+      } else if (name == 'min-height') {
+        this.monacoMinHeightChanged();
       }
     }, 100);
   }
@@ -81,6 +85,9 @@ class MonacoElement extends LitElement {
 
   firstUpdated() {
     super.firstUpdated();
+    if (this.rValue && this.rValue != this.value) {
+      this.value = this.rValue;
+    }
     this.initIFrame();
     window.addEventListener('message', message => {
       this.handleMessage(message);
@@ -124,9 +131,11 @@ class MonacoElement extends LitElement {
 
   _handleMessage(data) {
     if (data.event === eventTypes.valueChanged) {
-      this.dispatchEvent(
-        new CustomEvent('value-changed', { detail: data.payload })
-      );
+      let value = data.payload;
+      if (this.rValue != value) {
+        this.rValue = value;
+        this.dispatchEvent(new CustomEvent('value-changed', { detail: this.rValue }));
+      }
     } else if (data.event === eventTypes.ready) {
       this.onIFrameReady();
     } else if (data.event == eventTypes.heightChanged) {
@@ -138,6 +147,9 @@ class MonacoElement extends LitElement {
     this.monacoValueChanged(this.value);
     this.monacoLanguageChanged(this.language);
     this.monacoThemeChanged(this.theme);
+    this.monacoAutogrowChanged();
+    this.monacoMaxHeightChanged();
+    this.monacoMinHeightChanged();
   }
 
   monacoValueChanged(value) {
@@ -158,6 +170,10 @@ class MonacoElement extends LitElement {
 
   monacoMaxHeightChanged() {
     this.postMessage(eventTypes.maxHeightChanged, this.maxHeight);
+  }
+
+  monacoMinHeightChanged() {
+    this.postMessage(eventTypes.minHeightChanged, this.minHeight);
   }
 
   postMessage(event, payload) {

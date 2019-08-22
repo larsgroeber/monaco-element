@@ -9,16 +9,19 @@ const eventTypes = {
   themeChanged: 'themeChanged',
   autogrowChanged: 'autogrowChanged',
   heightChanged: 'heightChanged',
-  maxHeightChanged: 'maxHeightChanged'
+  maxHeightChanged: 'maxHeightChanged',
+  minHeightChanged: 'minHeightChanged'
 };
 
 class MonacoEditor {
+
   constructor() {
     this.language = 'javascript';
     this.value = '';
     this.theme = 'vs-dark';
     this.autogrow = false;
     this.maxHeight = -1;
+    this.minHeight = -1;
     this.editor = null;
     this.setupEventListener('message', this.handleMessage.bind(this));
     this.setupEditor();
@@ -39,10 +42,10 @@ class MonacoEditor {
       const model = this.editor.getModel();
       model.onDidChangeContent(() => {
         const value = model.getValue();
+        this.onValueChanged(value);
         if (this.autogrow) {
           this.grow();
         }
-        this.onValueChanged(value);
       });
 
       this.ready();
@@ -68,14 +71,15 @@ class MonacoEditor {
       case eventTypes.themeChanged:
         this.onThemeChanged(data.payload);
         break;
-      case eventTypes.sizeChanged:
-        this.setSize(data.payload);
-        break;
       case eventTypes.autogrowChanged:
         this.onAutoGrowChanged(data.payload);
         break;
       case eventTypes.maxHeightChanged:
         this.maxHeight = data.payload;
+        this.grow();
+        break;
+      case eventTypes.minHeightChanged:
+        this.minHeight = data.payload;
         this.grow();
         break;
     }
@@ -106,31 +110,28 @@ class MonacoEditor {
 
   grow() {
     if (this.editor) {
-      const height = this.editor.getModel().getLineCount() * 19 ;
+      const height = this.editor.getModel().getLineCount() * 19;
       this.setHeight(height);
     }
   }
 
   onInputValueChanged(newValue) {
-    if (newValue !== this.value) {
-      this.value = newValue;
-      require(['vs/editor/editor.main'], () => {
+    require(['vs/editor/editor.main'], () => {
+      if (newValue !== this.value) {
+        this.value = newValue;
         this.editor.getModel().setValue(newValue);
-      });
-      this.postMessage(eventTypes.valueChanged, newValue);
-    }
+      }
+    });
   } 
 
   setHeight(height) {
-    if (this.maxHeight > 0 && height > this.maxHeight) {
-      return;
-    }
-    let container = document.querySelector('#container');
-    let body = document.querySelector('body');
-    container.style.height = height + 'px';
-    body.style.height = height + 'px';
-    this.editor.layout();
+    height = this.maxHeight > 0 && height > this.maxHeight ? this.maxHeight : height;
+    height = this.minHeight > 0 && height < this.minHeight ? this.minHeight : height;
     this.postMessage(eventTypes.heightChanged, height);
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => {
+      this.editor.layout();
+    }, 1);
   }
 
   onAutoGrowChanged(autogrow) {

@@ -5,5 +5,6 @@ export const eventTypes = {
   themeChanged: 'themeChanged',
   autogrowChanged: 'autogrowChanged',
   heightChanged: 'heightChanged',
-  maxHeightChanged: 'maxHeightChanged'
+  maxHeightChanged: 'maxHeightChanged',
+  minHeightChanged: 'minHeightChanged'
 };
