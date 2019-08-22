@@ -1,4 +1,4 @@
-import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { html, css, LitElement } from 'lit-element';
 import { eventTypes } from './utils';
 import iframeScript from './monaco';
 
@@ -16,62 +16,64 @@ import iframeScript from './monaco';
  *
  * @author Lars Gröber <larsgroeber7@gmail.com>
  */
-class MonacoElement extends PolymerElement {
+class MonacoElement extends LitElement {
+
   constructor() {
     super();
     this.iframe = null;
+    this.value = '';
+    this.language = 'javascript';
+    this.theme = 'vs-dark';
+    this.libPath = 'node_modules/monaco-editor/min/vs';
   }
 
-  static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-        }
-        iframe {
-          border: none;
-          width: 100%;
-          height: 100%;
-          padding: 0;
-        }
-      </style>
-      <iframe id="iframe"></iframe>
+  static get styles() {
+    const style = css`
+      :host {
+        display: block;
+      }
+      iframe {
+        border: none;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+      }
     `;
+
+    return [style];
   }
 
   static get properties() {
     return {
-      value: {
-        type: String,
-        value: '',
-        observer: 'monacoValueChanged',
-      },
-      language: {
-        type: String,
-        value: 'javascript',
-        observer: 'monacoLanguageChanged',
-      },
-      theme: {
-        type: String,
-        value: 'vs-dark',
-        observer: 'monacoThemeChanged',
-      },
-      libPath: {
-        type: String,
-        value: 'node_modules/monaco-editor/min/vs',
-      },
+      value: { type: String },
+      language: { type: String, reflect: true},
+      theme: { type: String, reflect: true},
+      libPath: { type: String },
     };
+  }
+
+  attributeChangedCallback(name, old, val) {
+    super.attributeChangedCallback(name, old, val);
+    if (name == "value" && old != val) {
+      this.monacoValueChanged(val);
+    } else if (name == "language" && old != val) {
+      this.monacoLanguageChanged(val);
+    } else if (name == "theme" && old != val) {
+      this.monacoThemeChanged(val);
+    }
+  }
+
+  render() {
+    return html`<iframe id="iframe"></iframe>`;
   }
 
   get document() {
     return this.iframe.contentWindow.document;
   }
 
-  ready() {
-    super.ready();
-
+  firstUpdated() {
+    super.firstUpdated();
     this.initIFrame();
-
     window.addEventListener('message', message => {
       this.handleMessage(message);
     });
@@ -159,7 +161,7 @@ class MonacoElement extends PolymerElement {
   }
 
   insertStyle() {
-    var css = `
+    let css = `
     body {
       height: 100vh;
       overflow: hidden;

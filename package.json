@@ -3,7 +3,7 @@
   "description": "Webcomponent wrapper for the monaco editor.",
   "main": "monaco-element.js",
   "license": "MIT",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "keywords": [
     "webcomponent",
     "polymer",
@@ -20,7 +20,7 @@
     "url": "https://github.com/Larsg7/monaco-element"
   },
   "dependencies": {
-    "@polymer/polymer": "^3.0.0",
+    "lit-element": "^2.2.0",
     "monaco-editor": "^0.14.3"
   },
   "devDependencies": {
