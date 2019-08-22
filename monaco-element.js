@@ -24,7 +24,7 @@ class MonacoElement extends LitElement {
     this.value = '';
     this.language = 'javascript';
     this.theme = 'vs-dark';
-    this.libPath = 'node_modules/monaco-editor/min/vs';
+    this.libPath = '/node_modules/monaco-editor/min/vs';
   }
 
   static get styles() {
@@ -48,19 +48,27 @@ class MonacoElement extends LitElement {
       value: { type: String },
       language: { type: String, reflect: true},
       theme: { type: String, reflect: true},
+      autogrow: {type: Boolean, reflect: true, attribute: 'autogrow'},
+      maxHeight: {type: Number, reflect: true, attribute: 'max-height'},
       libPath: { type: String },
     };
   }
 
   attributeChangedCallback(name, old, val) {
     super.attributeChangedCallback(name, old, val);
-    if (name == "value" && old != val) {
-      this.monacoValueChanged(val);
-    } else if (name == "language" && old != val) {
-      this.monacoLanguageChanged(val);
-    } else if (name == "theme" && old != val) {
-      this.monacoThemeChanged(val);
-    }
+    setTimeout(() => {
+      if (name == "value" && old != val) {
+        this.monacoValueChanged(val);
+      } else if (name == "language" && old != val) {
+        this.monacoLanguageChanged(val);
+      } else if (name == "theme" && old != val) {
+        this.monacoThemeChanged(val);
+      } else if (name == "autogrow") {
+        this.monacoAutogrowChanged();
+      } else if (name == 'max-height') {
+        this.monacoMaxHeightChanged();
+      }
+    }, 100);
   }
 
   render() {
@@ -121,6 +129,8 @@ class MonacoElement extends LitElement {
       );
     } else if (data.event === eventTypes.ready) {
       this.onIFrameReady();
+    } else if (data.event == eventTypes.heightChanged) {
+      this.iframe.style.height = data.payload + 'px';
     }
   }
 
@@ -140,6 +150,14 @@ class MonacoElement extends LitElement {
 
   monacoThemeChanged(value) {
     this.postMessage(eventTypes.themeChanged, value);
+  }
+
+  monacoAutogrowChanged() {
+    this.postMessage(eventTypes.autogrowChanged, this.autogrow);
+  }
+
+  monacoMaxHeightChanged() {
+    this.postMessage(eventTypes.maxHeightChanged, this.maxHeight);
   }
 
   postMessage(event, payload) {

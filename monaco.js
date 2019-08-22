@@ -7,32 +7,41 @@ const eventTypes = {
   valueChanged: 'valueChanged',
   languageChanged: 'languageChanged',
   themeChanged: 'themeChanged',
+  autogrowChanged: 'autogrowChanged',
+  heightChanged: 'heightChanged',
+  maxHeightChanged: 'maxHeightChanged'
 };
 
 class MonacoEditor {
   constructor() {
     this.language = 'javascript';
     this.value = '';
+    this.theme = 'vs-dark';
+    this.autogrow = false;
+    this.maxHeight = -1;
     this.editor = null;
     this.setupEventListener('message', this.handleMessage.bind(this));
     this.setupEditor();
   }
 
   setupEditor() {
-    require.config({ paths: { vs: 'node_modules/monaco-editor/min/vs' } });
+    require.config({ paths: { vs: '/node_modules/monaco-editor/min/vs' } });
     require(['vs/editor/editor.main'], () => {
       this.editor = monaco.editor.create(document.getElementById('container'), {
         value: this.value,
         language: this.language,
         scrollBeyondLastLine: false,
+        automaticLayout: true,
         minimap: {
           enabled: false
         }
       });
-
       const model = this.editor.getModel();
       model.onDidChangeContent(() => {
         const value = model.getValue();
+        if (this.autogrow) {
+          this.grow();
+        }
         this.onValueChanged(value);
       });
 
@@ -59,7 +68,15 @@ class MonacoEditor {
       case eventTypes.themeChanged:
         this.onThemeChanged(data.payload);
         break;
-      default:
+      case eventTypes.sizeChanged:
+        this.setSize(data.payload);
+        break;
+      case eventTypes.autogrowChanged:
+        this.onAutoGrowChanged(data.payload);
+        break;
+      case eventTypes.maxHeightChanged:
+        this.maxHeight = data.payload;
+        this.grow();
         break;
     }
   }
@@ -87,13 +104,41 @@ class MonacoEditor {
     });
   }
 
+  grow() {
+    if (this.editor) {
+      const height = this.editor.getModel().getLineCount() * 19 ;
+      this.setHeight(height);
+    }
+  }
+
   onInputValueChanged(newValue) {
     if (newValue !== this.value) {
       this.value = newValue;
-      this.editor.getModel().setValue(newValue);
+      require(['vs/editor/editor.main'], () => {
+        this.editor.getModel().setValue(newValue);
+      });
       this.postMessage(eventTypes.valueChanged, newValue);
     }
   } 
+
+  setHeight(height) {
+    if (this.maxHeight > 0 && height > this.maxHeight) {
+      return;
+    }
+    let container = document.querySelector('#container');
+    let body = document.querySelector('body');
+    container.style.height = height + 'px';
+    body.style.height = height + 'px';
+    this.editor.layout();
+    this.postMessage(eventTypes.heightChanged, height);
+  }
+
+  onAutoGrowChanged(autogrow) {
+    this.autogrow = autogrow;
+    if (this.autogrow) {
+      this.grow();
+    }
+  }
 
   onValueChanged(newValue) {
     if (newValue !== this.value) {
@@ -103,11 +148,17 @@ class MonacoEditor {
   }
 
   onLanguageChanged(newLang) {
-    monaco.editor.setModelLanguage(this.editor.getModel(), newLang);
+    require(['vs/editor/editor.main'], () => {
+      monaco.editor.setModelLanguage(this.editor.getModel(), newLang);
+    });
+    this.language = newLang;
   }
 
   onThemeChanged(newValue) {
-    monaco.editor.setTheme(newValue);
+    require(['vs/editor/editor.main'], () => {
+      monaco.editor.setTheme(newValue);
+    });
+    this.theme = newValue;
   }
 }
 
