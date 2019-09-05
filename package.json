@@ -1,31 +1,60 @@
 {
-  "name": "monaco-element",
+  "_from": "lit-monaco-element@~0.2.0",
+  "_id": "lit-monaco-element@0.2.0",
+  "_inBundle": false,
+  "_integrity": "sha512-1URG/cSiGFZG+xgtLWjHknv/efIrnbOvBZPkb1frd2ez1nuNT8awrWBhPNKBW9gRF/GmRr1VHX5jjjO2GPQcvA==",
+  "_location": "/lit-monaco-element",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "range",
+    "registry": true,
+    "raw": "lit-monaco-element@~0.2.0",
+    "name": "lit-monaco-element",
+    "escapedName": "lit-monaco-element",
+    "rawSpec": "~0.2.0",
+    "saveSpec": null,
+    "fetchSpec": "~0.2.0"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/lit-monaco-element/-/lit-monaco-element-0.2.0.tgz",
+  "_shasum": "4b4fb3a990b1899fb07df4f94c743ef9fbb1f2ac",
+  "_spec": "lit-monaco-element@~0.2.0",
+  "_where": "D:\\js\\boo-wysiwyg-e",
+  "author": {
+    "name": "Lars Gröber",
+    "email": "larsgroeber7@gmail.com",
+    "url": "https://www.larsgroeber.com"
+  },
+  "bugs": {
+    "url": "https://github.com/Larsg7/monaco-element/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "lit-element": "^2.2.0",
+    "monaco-editor": "^0.14.3"
+  },
+  "deprecated": false,
   "description": "Webcomponent wrapper for the monaco editor.",
-  "main": "monaco-element.js",
-  "license": "MIT",
-  "version": "0.1.5",
+  "devDependencies": {
+    "@polymer/iron-demo-helpers": "^3.0.0-pre.19",
+    "@webcomponents/webcomponentsjs": "^2.0.0",
+    "wct-browser-legacy": "^1.0.0"
+  },
+  "homepage": "https://github.com/Larsg7/monaco-element#readme",
   "keywords": [
     "webcomponent",
     "polymer",
     "monaco-editor",
     "code-editor"
   ],
-  "author": {
-    "name": "Lars Gröber",
-    "email": "larsgroeber7@gmail.com",
-    "url": "https://www.larsgroeber.com"
-  },
+  "license": "MIT",
+  "main": "monaco-element.js",
+  "name": "lit-monaco-element",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Larsg7/monaco-element"
+    "url": "git+https://github.com/Larsg7/monaco-element.git"
   },
-  "dependencies": {
-    "@polymer/polymer": "^3.0.0",
-    "monaco-editor": "^0.14.3"
-  },
-  "devDependencies": {
-    "@polymer/iron-demo-helpers": "^3.0.0-pre.19",
-    "@webcomponents/webcomponentsjs": "^2.0.0",
-    "wct-browser-legacy": "^1.0.0"
-  }
+  "version": "0.2.1"
 }

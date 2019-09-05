@@ -3,4 +3,8 @@ export const eventTypes = {
   valueChanged: 'valueChanged',
   languageChanged: 'languageChanged',
   themeChanged: 'themeChanged',
+  autogrowChanged: 'autogrowChanged',
+  heightChanged: 'heightChanged',
+  maxHeightChanged: 'maxHeightChanged',
+  minHeightChanged: 'minHeightChanged'
 };

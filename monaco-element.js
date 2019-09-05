@@ -1,4 +1,4 @@
-import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { html, css, LitElement } from 'lit-element';
 import { eventTypes } from './utils';
 import iframeScript from './monaco';
 
@@ -16,62 +16,79 @@ import iframeScript from './monaco';
  *
  * @author Lars Gröber <larsgroeber7@gmail.com>
  */
-class MonacoElement extends PolymerElement {
+class MonacoElement extends LitElement {
+
   constructor() {
     super();
     this.iframe = null;
+    this.value = '';
+    this.language = 'javascript';
+    this.theme = 'vs-dark';
+    this.libPath = '/node_modules/monaco-editor/min/vs';
   }
 
-  static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-        }
-        iframe {
-          border: none;
-          width: 100%;
-          height: 100%;
-          padding: 0;
-        }
-      </style>
-      <iframe id="iframe"></iframe>
+  static get styles() {
+    const style = css`
+      :host {
+        display: block;
+      }
+      iframe {
+        border: none;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+      }
     `;
+
+    return [style];
   }
 
   static get properties() {
     return {
-      value: {
-        type: String,
-        value: '',
-        observer: 'monacoValueChanged',
-      },
-      language: {
-        type: String,
-        value: 'javascript',
-        observer: 'monacoLanguageChanged',
-      },
-      theme: {
-        type: String,
-        value: 'vs-dark',
-        observer: 'monacoThemeChanged',
-      },
-      libPath: {
-        type: String,
-        value: 'node_modules/monaco-editor/min/vs',
-      },
+      value: { type: String, reflect: true },
+      rValue: { type: String, reflect: true, attribute: 'r-value' },
+      language: { type: String, reflect: true},
+      theme: { type: String, reflect: true},
+      autogrow: {type: Boolean, reflect: true, attribute: 'autogrow'},
+      maxHeight: {type: Number, reflect: true, attribute: 'max-height'},
+      minHeight: {type: Number, reflect: true, attribute: 'min-height'},
+      libPath: { type: String },
     };
+  }
+
+  attributeChangedCallback(name, old, val) {
+    super.attributeChangedCallback(name, old, val);
+    setTimeout(() => {
+      if (name == "value" && old != val) {
+        this.monacoValueChanged(val);
+      } else if (name == "language" && old != val) {
+        this.monacoLanguageChanged(val);
+      } else if (name == "theme" && old != val) {
+        this.monacoThemeChanged(val);
+      } else if (name == "autogrow") {
+        this.monacoAutogrowChanged();
+      } else if (name == 'max-height') {
+        this.monacoMaxHeightChanged();
+      } else if (name == 'min-height') {
+        this.monacoMinHeightChanged();
+      }
+    }, 100);
+  }
+
+  render() {
+    return html`<iframe id="iframe"></iframe>`;
   }
 
   get document() {
     return this.iframe.contentWindow.document;
   }
 
-  ready() {
-    super.ready();
-
+  firstUpdated() {
+    super.firstUpdated();
+    if (this.rValue && this.rValue != this.value) {
+      this.value = this.rValue;
+    }
     this.initIFrame();
-
     window.addEventListener('message', message => {
       this.handleMessage(message);
     });
@@ -114,11 +131,15 @@ class MonacoElement extends PolymerElement {
 
   _handleMessage(data) {
     if (data.event === eventTypes.valueChanged) {
-      this.dispatchEvent(
-        new CustomEvent('value-changed', { detail: data.payload })
-      );
+      let value = data.payload;
+      if (this.rValue != value) {
+        this.rValue = value;
+        this.dispatchEvent(new CustomEvent('value-changed', { detail: this.rValue }));
+      }
     } else if (data.event === eventTypes.ready) {
       this.onIFrameReady();
+    } else if (data.event == eventTypes.heightChanged) {
+      this.iframe.style.height = data.payload + 'px';
     }
   }
 
@@ -126,6 +147,9 @@ class MonacoElement extends PolymerElement {
     this.monacoValueChanged(this.value);
     this.monacoLanguageChanged(this.language);
     this.monacoThemeChanged(this.theme);
+    this.monacoAutogrowChanged();
+    this.monacoMaxHeightChanged();
+    this.monacoMinHeightChanged();
   }
 
   monacoValueChanged(value) {
@@ -138,6 +162,18 @@ class MonacoElement extends PolymerElement {
 
   monacoThemeChanged(value) {
     this.postMessage(eventTypes.themeChanged, value);
+  }
+
+  monacoAutogrowChanged() {
+    this.postMessage(eventTypes.autogrowChanged, this.autogrow);
+  }
+
+  monacoMaxHeightChanged() {
+    this.postMessage(eventTypes.maxHeightChanged, this.maxHeight);
+  }
+
+  monacoMinHeightChanged() {
+    this.postMessage(eventTypes.minHeightChanged, this.minHeight);
   }
 
   postMessage(event, payload) {
@@ -159,7 +195,7 @@ class MonacoElement extends PolymerElement {
   }
 
   insertStyle() {
-    var css = `
+    let css = `
     body {
       height: 100vh;
       overflow: hidden;
